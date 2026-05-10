@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI SQL Chatbot</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 900px;
+            height: 92vh;
+            background-color: #1e293b;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.45);
+        }
+
+        .chat-header {
+            background-color: #111827;
+            color: white;
+            padding: 22px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #2563eb;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 16px;
+            max-width: 72%;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: #334155;
+            color: white;
+            padding: 18px;
+            border-radius: 16px;
+            max-width: 92%;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .ai-response-box {
+            margin-bottom: 15px;
+            background-color: #0f172a;
+            padding: 16px;
+            border-radius: 12px;
+            color: white;
+            line-height: 1.7;
+            border-left: 5px solid #38bdf8;
+        }
+
+        .sql-box {
+            margin-top: 12px;
+            background-color: #0f172a;
+            padding: 14px;
+            border-radius: 12px;
+            overflow-x: auto;
+            color: #38bdf8;
+            font-size: 14px;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            background-color: #020617;
+            padding: 15px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .chat-input {
+            padding: 22px;
+            background-color: #111827;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            background-color: #e2e8f0;
+        }
+
+        .chat-input button {
+            padding: 16px 24px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+        .chat-input button:hover {
+            background-color: #1d4ed8;
+            transform: scale(1.03);
+        }
+
+        .error-box {
+            margin-top: 12px;
+            background-color: #7f1d1d;
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+            text-align: center;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #87CEEB;
+            color: black;
+            padding: 16px 20px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 14px 20px;
+            background-color: white;
+            color: black;
+            font-size: 14px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #cbd5e1;
+        }
+
+        tr:hover td {
+            background-color: #f1f5f9;
+        }
+
+        strong {
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <div class="chat-header">
+            SchemaGPT
+        </div>
+
+        <div class="chat-box">
+
+            {% if question %}
+
+            <div class="user-message">
+                {{ question }}
+            </div>
+
+            {% endif %}
+
+            {% if sql_query %}
+
+            <div class="bot-message">
+
+                {% if ai_response %}
+
+                <div class="ai-response-box">
+                    {{ ai_response }}
+                </div>
+
+                {% endif %}
+
+                <strong>Generated SQL:</strong>
+
+                <div class="sql-box">
+                    {{ sql_query }}
+                </div>
+
+                {% if results %}
+
+                <div class="result-box">
+
+                    <strong>Results:</strong>
+
+                    <table>
+
+                        {% if columns %}
+
+                        <tr>
+
+                            {% for column in columns %}
+
+                            <th>{{ column }}</th>
+
+                            {% endfor %}
+
+                        </tr>
+
+                        {% endif %}
+
+                        {% for row in results %}
+
+                        <tr>
+
+                            {% for item in row %}
+
+                            <td>{{ item }}</td>
+
+                            {% endfor %}
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </table>
+
+                </div>
+
+                {% endif %}
+
+                {% if error %}
+
+                <div class="error-box">
+                    {{ error }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <form method="POST" class="chat-input">
+
+            <input type="text" name="question" placeholder="Ask anything about your database..." required>
+
+            <button type="submit">
+                Send
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>
