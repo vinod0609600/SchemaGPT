@@ -26,4 +26,4 @@ An AI-powered Text-to-SQL chatbot built using Flask, SQLite, and Groq LLM.
 
 ```bash
 pip install -r requirements.txt
-python app.py
+python ai.py
